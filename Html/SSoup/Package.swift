@@ -4,24 +4,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "ISerialKit.Html.SwiftSoup",
+    name: "ISerialKit.Html.SSoup",
     platforms: [.macOS(.v10_15),.iOS(.v13)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "ISerialKit.Html.SwiftSoup",
-            targets: ["ISerialKit.Html.SwiftSoup"]),
+            name: "ISerialKit.Html.SSoup",
+            targets: ["ISerialKit.Html.SSoup"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.10.1")
+        .package(name:"SwiftSoup", path: "../../../ISwiftSoup")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "ISerialKit.Html.SwiftSoup",dependencies: [
-                "SwiftSoup"
-            ]),
+            name: "ISerialKit.Html.SSoup",dependencies: ["SwiftSoup"]),
 
     ]
 )
