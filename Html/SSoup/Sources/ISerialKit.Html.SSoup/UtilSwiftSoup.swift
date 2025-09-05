@@ -11,40 +11,55 @@ public extension String {
     func inlineStylesWithCssParserSafe() throws -> String {
         return try UtilPhCss.inlineStylesWithCssParserSafe(self)
     }
+    
+    func removeTagsButKeepContent(tag:String) throws ->String{
+        return try  UtilPhCss.removeTagsButKeepContent(strHtml: self, tag: tag)
+    }
 }
 
 //==========================================================>
 
 public final class UtilPhCss {
-    public static func inlineStylesWithCssParserSafe(_ htmlString: String) throws -> String {
+    //移除特定标签并保留内容
+    public static func removeTagsButKeepContent(strHtml: String,tag:String) throws -> String {
+        let doc = try SwiftSoup.parse(strHtml)
+        let aTags = try doc.select(tag)
+        
+        // 使用 unwrap() 方法移除标签但保留内容
+        try aTags.unwrap()
+        
+        return try doc.html()
+    }
+    
+    public static func inlineStylesWithCssParserSafe(_ strHtml: String) throws -> String {
         // 安全的使用方式
         do {
-            let htmlWithInlineStyles = try htmlString.inlineStylesWithCssParser()
+            let htmlWithInlineStyles = try strHtml.inlineStylesWithCssParser()
             print("CSS内联处理成功")
             return htmlWithInlineStyles
         } catch {
             print("CSS内联失败: \(error)")
             
             // 降级方案：移除style标签但保留其他内容
-            return removeStyleTagsFallback(htmlString)
+            return removeStyleTagsFallback(strHtml)
         }
     }
     
-    public static func removeStyleTagsFallback(_ htmlString: String) -> String {
-            do {
-                let document = try SwiftSoup.parse(htmlString)
-                try document.select("style").remove()
-                let fallbackHtml = try document.html()
-                print("使用降级方案：已移除style标签")
-                return fallbackHtml
-            } catch {
-                print("降级方案也失败: \(error)，返回原始HTML")
-                return htmlString
-            }
+    public static func removeStyleTagsFallback(_ strHtml: String) -> String {
+        do {
+            let document = try SwiftSoup.parse(strHtml)
+            try document.select("style").remove()
+            let fallbackHtml = try document.html()
+            print("使用降级方案：已移除style标签")
+            return fallbackHtml
+        } catch {
+            print("降级方案也失败: \(error)，返回原始HTML")
+            return strHtml
         }
+    }
     
-    public static func inlineStylesWithCssParser(_ htmlString: String) throws -> String {
-        let document = try SwiftSoup.parse(htmlString)
+    public static func inlineStylesWithCssParser(_ strHtml: String) throws -> String {
+        let document = try SwiftSoup.parse(strHtml)
         let styleTags = try document.select("style")
         
         // 收集所有 CSS 规则
